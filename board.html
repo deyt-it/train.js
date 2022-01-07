@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset='utf-8'>
+	<meta http-equiv='X-UA-Compatible' content='IE=edge'>
+	<title>Board</title>
+	<meta name='viewport' content='width=device-width, initial-scale=1'>
+</head>
+<body>
+	<div class="wrap_board">
+		<ul class="board" id="board"></ul>
+		<div class="paging" id="paging"></div>
+	</div>
+<script>
+	const boardContainer = document.getElementById('board')
+	const pagingContainer = document.getElementById('paging')
+
+	const total = 500
+	const params = {
+		size: 10, 
+		page: 8, 
+		pageSize: 7, 
+		total: total
+	}
+	paging(params)
+
+	
+	// 함수: 페이징영역 생성
+	function paging(params) {
+		let {size, page, pageSize, total} = params
+		if (total <= 0) { return }
+		if (page > Math.ceil(total/size) || page < 1) { page = 1 }
+		
+        // 페이징영역 내 마크업 초기화
+        while(pagingContainer.firstChild){
+            // console.log('페이징 마크업 비우는중');
+            pagingContainer.removeChild(pagingContainer.firstChild);
+        }
+
+
+		const lastPage = Math.ceil(total/size)
+		const pageGroupIdx = Math.ceil(page/pageSize)
+		const lastpageGroupIdx = Math.ceil(lastPage/pageSize)
+		console.log('lastPage', lastPage)
+		console.log('pageGroupIdx', pageGroupIdx)
+		console.log('lastpageGroupIdx', lastpageGroupIdx)
+
+		let last = pageGroupIdx * pageSize
+		let first = last - pageSize + 1
+		if (pageGroupIdx >= lastpageGroupIdx) { last = Math.ceil(total/size) }
+		
+		// 숫자버튼 생성
+		const btPageWrap = getElement(['page'], '');
+		const btPageOptions = {
+			first: first, 
+			last: last, 
+			currentPage: page, 
+		}
+		pagingContainer.appendChild( getBtPage(btPageWrap, btPageOptions) )
+
+		// 좌우 버튼 생성
+		const btPrevF = getElement(['direction', 'prev_fast'], '처음');
+		const btPrev = getElement(['direction', 'prev'], '이전');
+		const btNext = getElement(['direction', 'next'], '다음');
+		const btNextF = getElement(['direction', 'next_fast'], '끝');
+
+		if (first > pageSize) {
+			pagingContainer.prepend(btPrev)
+			pagingContainer.prepend(btPrevF)
+		}
+		if (last < lastPage) {
+			pagingContainer.append(btNext)
+			pagingContainer.append(btNextF)
+		}
+
+
+		console.log('first', first)
+		console.log('last', last)
+
+	}
+	// 함수: 엘리먼트 생성
+	function getElement(classes, text){
+		const span = document.createElement('span');
+		// console.log('↓엘리먼트 생성 span: '+className)
+		// console.log(span);
+		if (text!='') {
+			const textNode = document.createTextNode(text);
+			span.appendChild(textNode);
+		}
+		if (classes.length) {
+			for (let index = 0; index < classes.length; index++) {
+				span.classList.add(classes[index]);
+			}
+		}
+		return span
+
+	}
+	// 함수: 숫자버튼 생성
+	function getBtPage(container, params){
+		console.log('[숫자버튼 생성]')
+		const {first, last, currentPage} = params
+		// while(container.firstChild){
+		// 	container.removeChild(container.firstChild);
+		// }
+		for (let index = first; index <= last; index++) {
+			const span = getElement([], index);
+			if (index == currentPage) { span.classList.add('on') }
+			container.appendChild(span);
+		}
+		return container
+		
+	}
+</script>	
+</body>
+</html>
